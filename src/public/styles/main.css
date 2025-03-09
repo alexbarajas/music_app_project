@@ -2,10 +2,6 @@ body {
     background-color: black;
 }
 
-header {
-    margin: 0;
-}
-
 h1, h2, p {
     color: white;
 }

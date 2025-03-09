@@ -6,29 +6,29 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import Paper from "@mui/material/Paper";
 
-export default function FixedBottomNavigation() {
+export default function Footer() {
   return (
-    <footer>
-      <Paper
+    <Paper
+      sx={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        width: "100vw",
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
+      elevation={3}
+    >
+      <BottomNavigation
+        showLabels
         sx={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
+          backgroundColor: "lightblue",
         }}
-        elevation={3}
       >
-        <BottomNavigation
-          showLabels
-          sx={{
-            backgroundColor: "lightblue",
-          }}
-        >
-          <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
-          <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
-          <BottomNavigationAction label="Archive" icon={<ArchiveIcon />} />
-        </BottomNavigation>
-      </Paper>
-    </footer>
+        <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
+        <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
+        <BottomNavigationAction label="Archive" icon={<ArchiveIcon />} />
+      </BottomNavigation>
+    </Paper>
   );
 }
