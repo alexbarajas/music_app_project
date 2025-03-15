@@ -6,9 +6,30 @@ import Footer from "./components/Footer";
 import Error from "./pages/Error";
 import Sidebar from "./components/Sidebar";
 import Box from "@mui/material/Box";
+import AudioPlayer from "./components/AudioPlayer";
 
 export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const {
+    tracks,
+    currentTrackIndex,
+    isPlaying,
+    volume,
+    duration,
+    currentTime,
+    handleFilesSelected,
+    handlePlayPause,
+    handlePrevious,
+    handleNext,
+    handleVolumeChange,
+    handleTrackSelect,
+    handleSeek,
+    getCurrentTrack,
+    getTrackTitle,
+    getArtistName,
+    hasPrevious,
+    hasNext,
+  } = AudioPlayer();
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -44,12 +65,37 @@ export default function App() {
             }}
           >
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route
+                path="/"
+                element={
+                  <Home
+                    onFilesSelected={handleFilesSelected}
+                    tracks={tracks}
+                    currentTrackIndex={currentTrackIndex}
+                    onTrackSelect={handleTrackSelect}
+                  />
+                }
+              />
               <Route path="/*" element={<Error />} />
             </Routes>
           </Box>
         </Box>
-        <Footer />
+        <Footer
+          isPlaying={isPlaying}
+          onPlayPause={handlePlayPause}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          volume={volume}
+          onVolumeChange={handleVolumeChange}
+          trackTitle={getTrackTitle()}
+          artistName={getArtistName()}
+          currentTrack={getCurrentTrack()}
+          hasPrevious={hasPrevious}
+          hasNext={hasNext}
+          duration={duration}
+          currentTime={currentTime}
+          onSeek={handleSeek}
+        />
       </Box>
     </Router>
   );

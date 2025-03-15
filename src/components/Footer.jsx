@@ -7,16 +7,69 @@ import {
   Paper,
   useMediaQuery,
   useTheme,
+  Tooltip,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import RepeatIcon from "@mui/icons-material/Repeat";
+import RepeatOneIcon from "@mui/icons-material/RepeatOne";
 
-export default function Footer() {
-  const [volume, setVolume] = React.useState(30);
+export default function Footer({
+  isPlaying = false,
+  onPlayPause = () => {},
+  onPrevious = () => {},
+  onNext = () => {},
+  volume = 30,
+  onVolumeChange = () => {},
+  trackTitle = "No track selected",
+  artistName = "Unknown Artist",
+  currentTrack = null,
+  hasPrevious = false,
+  hasNext = false,
+  duration = 0,
+  currentTime = 0,
+  onSeek = () => {},
+  loopMode = "all",
+  onLoopToggle = () => {},
+}) {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Format time as mm:ss
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  // Get appropriate loop icon and tooltip text
+  const getLoopInfo = () => {
+    switch (loopMode) {
+      case "one":
+        return {
+          icon: <RepeatOneIcon />,
+          tooltip: "Repeat One",
+          color: "primary.main",
+        };
+      case "all":
+        return {
+          icon: <RepeatIcon />,
+          tooltip: "Repeat All",
+          color: "primary.main",
+        };
+      default:
+        return {
+          icon: <RepeatIcon />,
+          tooltip: "No Repeat",
+          color: "text.secondary",
+        };
+    }
+  };
+
+  const loopInfo = getLoopInfo();
 
   return (
     <Paper
@@ -26,7 +79,8 @@ export default function Footer() {
         bottom: 0,
         left: 0,
         right: 0,
-        height: 56, // Standard height
+        height: "auto", // Allow height to adjust for progress bar
+        paddingBottom: 1,
         zIndex: 1300, // High z-index to ensure it's above everything
         backgroundColor: "lightblue",
         width: "100%", // Ensure full width
@@ -34,11 +88,61 @@ export default function Footer() {
         overflow: "visible", // This allows the slider thumb to overflow without being cut
       }}
     >
+      {/* Progress bar - displayed at the top of the footer */}
+      <Box sx={{ px: 2, pt: 1 }}>
+        <Slider
+          size="small"
+          value={currentTime}
+          max={duration || 100}
+          onChange={(e, newValue) => onSeek(newValue)}
+          aria-label="Progress"
+          sx={{
+            color: "black",
+            height: 4,
+            "& .MuiSlider-thumb": {
+              width: 8,
+              height: 8,
+              backgroundColor: "black",
+              "&:hover, &.Mui-focusVisible": {
+                boxShadow: "0px 0px 0px 8px rgba(0, 0, 0, 0.16)",
+              },
+              "&.Mui-active": {
+                width: 12,
+                height: 12,
+              },
+            },
+            "& .MuiSlider-rail": {
+              opacity: 0.5,
+            },
+          }}
+        />
+
+        {/* Time display */}
+        {!isSmallScreen && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mt: -1,
+              mb: 1,
+              fontSize: "0.75rem",
+            }}
+          >
+            <Typography variant="caption" color="text.secondary">
+              {formatTime(currentTime)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {formatTime(duration)}
+            </Typography>
+          </Box>
+        )}
+      </Box>
+
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
-          height: "100%",
+          height: 56, // Standard height for main controls
           width: "100%",
           maxWidth: "100%",
           px: 1, // Reduced overall padding
@@ -62,6 +166,10 @@ export default function Footer() {
               width: { xs: 32, sm: 40 },
               height: { xs: 32, sm: 40 },
               flexShrink: 0,
+              backgroundColor: currentTrack ? "#6b46c1" : "#e2e8f0", // Purple when track loaded
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
             src="/api/placeholder/40/40"
             alt="Album cover"
@@ -75,10 +183,10 @@ export default function Footer() {
             }}
           >
             <Typography variant="subtitle2" noWrap color="black">
-              Song Title
+              {trackTitle}
             </Typography>
             <Typography variant="caption" color="black" noWrap>
-              Artist Name
+              {artistName}
             </Typography>
           </Box>
         </Box>
@@ -95,6 +203,8 @@ export default function Footer() {
           <IconButton
             size={isSmallScreen ? "small" : "medium"}
             sx={{ color: "black" }}
+            onClick={onPrevious}
+            disabled={!hasPrevious}
           >
             <SkipPreviousIcon fontSize={isSmallScreen ? "small" : "medium"} />
           </IconButton>
@@ -104,15 +214,34 @@ export default function Footer() {
               color: "black",
             }}
             size={isSmallScreen ? "small" : "medium"}
+            onClick={onPlayPause}
+            disabled={!currentTrack}
           >
-            <PlayArrowIcon sx={{ fontSize: { xs: 28, sm: 36 } }} />
+            {isPlaying ? (
+              <PauseIcon sx={{ fontSize: { xs: 28, sm: 36 } }} />
+            ) : (
+              <PlayArrowIcon sx={{ fontSize: { xs: 28, sm: 36 } }} />
+            )}
           </IconButton>
           <IconButton
             size={isSmallScreen ? "small" : "medium"}
             sx={{ color: "black" }}
+            onClick={onNext}
+            disabled={!hasNext}
           >
             <SkipNextIcon fontSize={isSmallScreen ? "small" : "medium"} />
           </IconButton>
+
+          {/* Loop button */}
+          <Tooltip title={loopInfo.tooltip}>
+            <IconButton
+              size={isSmallScreen ? "small" : "medium"}
+              onClick={onLoopToggle}
+              sx={{ color: loopInfo.color }}
+            >
+              {loopInfo.icon}
+            </IconButton>
+          </Tooltip>
         </Box>
 
         {/* Volume control - position to ensure visibility */}
@@ -136,7 +265,7 @@ export default function Footer() {
           <Slider
             size="small"
             value={volume}
-            onChange={(e, newValue) => setVolume(newValue)}
+            onChange={onVolumeChange}
             aria-label="Volume"
             sx={{
               width: { xs: 50, sm: 80 }, // Smaller fixed width
