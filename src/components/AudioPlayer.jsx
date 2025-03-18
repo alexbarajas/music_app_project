@@ -6,9 +6,11 @@ const AudioPlayer = () => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(50);
+  const [previousVolume, setPreviousVolume] = useState(50); // Store volume before muting
+  const [isMuted, setIsMuted] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [loopMode, setLoopMode] = useState("all"); // "none", "one", or "all"
+  const [loopMode, setLoopMode] = useState("all"); // Starting with "all", will cycle through "all" -> "one" -> "none"
   const [trackMetadata, setTrackMetadata] = useState({});
   const audioRef = useRef(new Audio());
 
@@ -42,16 +44,36 @@ const AudioPlayer = () => {
     audio.addEventListener("durationchange", handleDurationChange);
 
     // Update volume initially
-    audio.volume = volume / 100;
+    audio.volume = isMuted ? 0 : volume / 100;
 
     return () => {
       // Clean up event listeners
       audio.removeEventListener("ended", handleEnded);
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("durationchange", handleDurationChange);
-      audio.pause();
     };
-  }, [loopMode]); // Added loopMode as dependency
+  }, []); // Remove loopMode from dependencies to prevent re-renders on loop change
+
+  // Handle ended event with loop mode inside
+  useEffect(() => {
+    const audio = audioRef.current;
+    const handleEnded = () => {
+      if (loopMode === "one") {
+        // Replay the same track
+        audio.currentTime = 0;
+        audio.play().catch((error) => {
+          console.error("Replay failed:", error);
+        });
+      } else {
+        handleNext();
+      }
+    };
+
+    audio.addEventListener("ended", handleEnded);
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [loopMode]); // Only update this event listener when loopMode changes
 
   // Parse metadata when tracks change
   const parseMetadata = async (file) => {
@@ -129,8 +151,8 @@ const AudioPlayer = () => {
 
   // Handle volume change
   useEffect(() => {
-    audioRef.current.volume = volume / 100;
-  }, [volume]);
+    audioRef.current.volume = isMuted ? 0 : volume / 100;
+  }, [volume, isMuted]);
 
   // Handle play state change
   useEffect(() => {
@@ -180,7 +202,16 @@ const AudioPlayer = () => {
   };
 
   const handleNext = () => {
-    if (currentTrackIndex < tracks.length - 1) {
+    if (loopMode === "one") {
+      // For Repeat One mode, restart the current track instead of moving to next
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        setCurrentTime(0);
+        if (!isPlaying) {
+          setIsPlaying(true);
+        }
+      }
+    } else if (currentTrackIndex < tracks.length - 1) {
       setCurrentTrackIndex(currentTrackIndex + 1);
     } else if (loopMode === "all" && tracks.length > 0) {
       // Loop back to first track when reached the end
@@ -192,16 +223,35 @@ const AudioPlayer = () => {
   };
 
   const toggleLoopMode = () => {
-    // Cycle through loop modes: none -> one -> all -> none
+    // Cycle through loop modes: all -> one -> none -> all
     setLoopMode((prev) => {
-      if (prev === "none") return "one";
-      if (prev === "one") return "all";
-      return "none";
+      if (prev === "all") return "one";
+      if (prev === "one") return "none";
+      return "all";
     });
+    // Make sure we don't interrupt playback when changing loop mode
+    if (isPlaying) {
+      // We're not updating the audioRef directly here
+      // The playback should continue uninterrupted
+    }
   };
 
   const handleVolumeChange = (event, newValue) => {
     setVolume(newValue);
+    if (isMuted && newValue > 0) {
+      setIsMuted(false);
+    }
+  };
+
+  const handleMuteToggle = () => {
+    if (!isMuted) {
+      // Store current volume before muting
+      setPreviousVolume(volume);
+    } else {
+      // Restore previous volume when unmuting
+      setVolume(previousVolume);
+    }
+    setIsMuted(!isMuted);
   };
 
   const handleTrackSelect = (index) => {
@@ -249,6 +299,7 @@ const AudioPlayer = () => {
     currentTrackIndex,
     isPlaying,
     volume,
+    isMuted,
     duration,
     currentTime,
     loopMode,
@@ -257,6 +308,7 @@ const AudioPlayer = () => {
     handlePrevious,
     handleNext,
     handleVolumeChange,
+    handleMuteToggle,
     handleTrackSelect,
     handleSeek,
     toggleLoopMode,
@@ -265,7 +317,10 @@ const AudioPlayer = () => {
     getArtistName,
     getAlbumArt,
     hasPrevious: currentTrackIndex > 0 || loopMode === "all",
-    hasNext: currentTrackIndex < tracks.length - 1 || loopMode === "all",
+    hasNext:
+      currentTrackIndex < tracks.length - 1 ||
+      loopMode === "all" ||
+      loopMode === "one",
   };
 };
 

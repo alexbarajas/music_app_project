@@ -14,6 +14,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff"; // Added for mute functionality
 import RepeatIcon from "@mui/icons-material/Repeat";
 import RepeatOneIcon from "@mui/icons-material/RepeatOne";
 
@@ -24,6 +25,8 @@ export default function Footer({
   onNext = () => {},
   volume = 30,
   onVolumeChange = () => {},
+  onMuteToggle = () => {}, // Added for mute functionality
+  isMuted = false, // Added for mute functionality
   trackTitle = "No track selected",
   artistName = "Unknown Artist",
   currentTrack = null,
@@ -213,37 +216,49 @@ export default function Footer({
           ml: 1,
         }}
       >
-        <IconButton
-          size="small"
-          sx={{ color: "black" }}
-          onClick={onPrevious}
-          disabled={!hasPrevious}
-        >
-          <SkipPreviousIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          sx={{
-            mx: 0.5,
-            color: "black",
-          }}
-          size="small"
-          onClick={onPlayPause}
-          disabled={!currentTrack}
-        >
-          {isPlaying ? (
-            <PauseIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
-          ) : (
-            <PlayArrowIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
-          )}
-        </IconButton>
-        <IconButton
-          size="small"
-          sx={{ color: "black" }}
-          onClick={onNext}
-          disabled={!hasNext}
-        >
-          <SkipNextIcon fontSize="small" />
-        </IconButton>
+        <Tooltip title="Previous Track">
+          <span>
+            <IconButton
+              size="small"
+              sx={{ color: "black" }}
+              onClick={onPrevious}
+              disabled={!hasPrevious}
+            >
+              <SkipPreviousIcon fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
+
+        <Tooltip title={isPlaying ? "Pause" : "Play"}>
+          <IconButton
+            sx={{
+              mx: 0.5,
+              color: "black",
+            }}
+            size="small"
+            onClick={onPlayPause}
+            disabled={!currentTrack}
+          >
+            {isPlaying ? (
+              <PauseIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
+            ) : (
+              <PlayArrowIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
+            )}
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title="Next Track">
+          <span>
+            <IconButton
+              size="small"
+              sx={{ color: "black" }}
+              onClick={onNext}
+              disabled={!hasNext}
+            >
+              <SkipNextIcon fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
 
         {/* Loop button */}
         <Tooltip title={loopInfo.tooltip}>
@@ -268,16 +283,23 @@ export default function Footer({
           width: { xs: "80px", sm: "100px" },
         }}
       >
-        <VolumeUpIcon
-          sx={{
-            mr: 0.5,
-            color: "black",
-            fontSize: "small",
-          }}
-        />
+        <Tooltip title={isMuted ? "Unmute" : "Mute"}>
+          <IconButton
+            size="small"
+            onClick={onMuteToggle}
+            sx={{ color: "black" }}
+          >
+            {isMuted ? (
+              <VolumeOffIcon sx={{ fontSize: "small" }} />
+            ) : (
+              <VolumeUpIcon sx={{ fontSize: "small" }} />
+            )}
+          </IconButton>
+        </Tooltip>
+
         <Slider
           size="small"
-          value={volume}
+          value={isMuted ? 0 : volume}
           onChange={onVolumeChange}
           aria-label="Volume"
           sx={{

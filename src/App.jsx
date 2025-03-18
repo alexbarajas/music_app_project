@@ -15,6 +15,7 @@ export default function App() {
     currentTrackIndex,
     isPlaying,
     volume,
+    isMuted,
     duration,
     currentTime,
     loopMode,
@@ -23,6 +24,7 @@ export default function App() {
     handlePrevious,
     handleNext,
     handleVolumeChange,
+    handleMuteToggle,
     handleTrackSelect,
     handleSeek,
     toggleLoopMode,
@@ -90,17 +92,19 @@ export default function App() {
           onNext={handleNext}
           volume={volume}
           onVolumeChange={handleVolumeChange}
+          isMuted={isMuted}
+          onMuteToggle={handleMuteToggle}
           trackTitle={getTrackTitle()}
           artistName={getArtistName()}
           currentTrack={getCurrentTrack()}
-          albumArt={getAlbumArt()} // Add this line to pass album art
+          albumArt={getAlbumArt()}
           hasPrevious={hasPrevious}
           hasNext={hasNext}
           duration={duration}
           currentTime={currentTime}
           onSeek={handleSeek}
-          loopMode={loopMode} // Add this line to pass loop mode
-          onLoopToggle={toggleLoopMode} // Add this line to pass loop toggle function
+          loopMode={loopMode}
+          onLoopToggle={toggleLoopMode}
         />
       </Box>
     </Router>
