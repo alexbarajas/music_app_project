@@ -27,6 +27,7 @@ export default function Footer({
   trackTitle = "No track selected",
   artistName = "Unknown Artist",
   currentTrack = null,
+  albumArt = null,
   hasPrevious = false,
   hasNext = false,
   duration = 0,
@@ -79,17 +80,88 @@ export default function Footer({
         bottom: 0,
         left: 0,
         right: 0,
-        height: "auto", // Allow height to adjust for progress bar
-        paddingBottom: 1,
-        zIndex: 1300, // High z-index to ensure it's above everything
+        height: isSmallScreen ? "56px" : "64px", // Reduced fixed height
+        zIndex: 1300,
         backgroundColor: "lightblue",
-        width: "100%", // Ensure full width
-        boxSizing: "border-box", // Include padding in width calculation
-        overflow: "visible", // This allows the slider thumb to overflow without being cut
+        width: "100%",
+        boxSizing: "border-box",
+        overflow: "visible",
+        display: "flex",
+        alignItems: "center",
       }}
     >
-      {/* Progress bar - displayed at the top of the footer */}
-      <Box sx={{ px: 2, pt: 1 }}>
+      {/* Track info */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: { xs: "25%", sm: "22%" },
+          pl: 1,
+        }}
+      >
+        {albumArt ? (
+          <Box
+            component="img"
+            sx={{
+              width: { xs: 32, sm: 40 },
+              height: { xs: 32, sm: 40 },
+              flexShrink: 0,
+              objectFit: "cover",
+              borderRadius: "2px",
+            }}
+            src={albumArt}
+            alt="Album cover"
+          />
+        ) : (
+          <Box
+            sx={{
+              width: { xs: 32, sm: 40 },
+              height: { xs: 32, sm: 40 },
+              flexShrink: 0,
+              backgroundColor: currentTrack ? "#6b46c1" : "#e2e8f0",
+              borderRadius: "2px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="caption" color="white">
+              {artistName?.charAt(0) || "♪"}
+            </Typography>
+          </Box>
+        )}
+        <Box
+          sx={{
+            display: { xs: "none", sm: "block" },
+            ml: 1,
+            overflow: "hidden",
+          }}
+        >
+          <Typography variant="subtitle2" noWrap color="black">
+            {trackTitle}
+          </Typography>
+          <Typography variant="caption" color="black" noWrap>
+            {artistName}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Time display - current time */}
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{
+          display: { xs: "none", sm: "block" },
+          width: "40px",
+          textAlign: "right",
+          pr: 1,
+        }}
+      >
+        {formatTime(currentTime)}
+      </Typography>
+
+      {/* Progress bar */}
+      <Box sx={{ flex: 1, px: 1 }}>
         <Slider
           size="small"
           value={currentTime}
@@ -116,176 +188,116 @@ export default function Footer({
             },
           }}
         />
-
-        {/* Time display */}
-        {!isSmallScreen && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              mt: -1,
-              mb: 1,
-              fontSize: "0.75rem",
-            }}
-          >
-            <Typography variant="caption" color="text.secondary">
-              {formatTime(currentTime)}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {formatTime(duration)}
-            </Typography>
-          </Box>
-        )}
       </Box>
 
+      {/* Time display - duration */}
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{
+          display: { xs: "none", sm: "block" },
+          width: "40px",
+          textAlign: "left",
+          pl: 1,
+        }}
+      >
+        {formatTime(duration)}
+      </Typography>
+
+      {/* Playback controls */}
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
-          height: 56, // Standard height for main controls
-          width: "100%",
-          maxWidth: "100%",
-          px: 1, // Reduced overall padding
+          justifyContent: "center",
+          ml: 1,
         }}
       >
-        {/* Track info - extremely simplified on small screens */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexShrink: 1,
-            width: { xs: "25%", sm: "30%" },
-            minWidth: isSmallScreen ? "80px" : "120px",
-            maxWidth: isSmallScreen ? "110px" : "200px",
-          }}
+        <IconButton
+          size="small"
+          sx={{ color: "black" }}
+          onClick={onPrevious}
+          disabled={!hasPrevious}
         >
-          {/* Show just the album art on very small screens */}
-          <Box
-            component="img"
-            sx={{
-              width: { xs: 32, sm: 40 },
-              height: { xs: 32, sm: 40 },
-              flexShrink: 0,
-              backgroundColor: currentTrack ? "#6b46c1" : "#e2e8f0", // Purple when track loaded
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            src="/api/placeholder/40/40"
-            alt="Album cover"
-          />
-          {/* Only show song info if there's enough space */}
-          <Box
-            sx={{
-              display: { xs: "none", sm: "block" },
-              ml: 1,
-              overflow: "hidden",
-            }}
-          >
-            <Typography variant="subtitle2" noWrap color="black">
-              {trackTitle}
-            </Typography>
-            <Typography variant="caption" color="black" noWrap>
-              {artistName}
-            </Typography>
-          </Box>
-        </Box>
-
-        {/* Playback controls - centered and with flexible width */}
-        <Box
+          <SkipPreviousIcon fontSize="small" />
+        </IconButton>
+        <IconButton
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flex: "1 1 auto",
+            mx: 0.5,
+            color: "black",
           }}
+          size="small"
+          onClick={onPlayPause}
+          disabled={!currentTrack}
         >
-          <IconButton
-            size={isSmallScreen ? "small" : "medium"}
-            sx={{ color: "black" }}
-            onClick={onPrevious}
-            disabled={!hasPrevious}
-          >
-            <SkipPreviousIcon fontSize={isSmallScreen ? "small" : "medium"} />
-          </IconButton>
-          <IconButton
-            sx={{
-              mx: { xs: 0.5, sm: 1 },
-              color: "black",
-            }}
-            size={isSmallScreen ? "small" : "medium"}
-            onClick={onPlayPause}
-            disabled={!currentTrack}
-          >
-            {isPlaying ? (
-              <PauseIcon sx={{ fontSize: { xs: 28, sm: 36 } }} />
-            ) : (
-              <PlayArrowIcon sx={{ fontSize: { xs: 28, sm: 36 } }} />
-            )}
-          </IconButton>
-          <IconButton
-            size={isSmallScreen ? "small" : "medium"}
-            sx={{ color: "black" }}
-            onClick={onNext}
-            disabled={!hasNext}
-          >
-            <SkipNextIcon fontSize={isSmallScreen ? "small" : "medium"} />
-          </IconButton>
-
-          {/* Loop button */}
-          <Tooltip title={loopInfo.tooltip}>
-            <IconButton
-              size={isSmallScreen ? "small" : "medium"}
-              onClick={onLoopToggle}
-              sx={{ color: loopInfo.color }}
-            >
-              {loopInfo.icon}
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        {/* Volume control - position to ensure visibility */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexShrink: 0, // Prevent this section from shrinking
-            width: { xs: "90px", sm: "120px" }, // Fixed width to ensure enough space
-            justifyContent: "flex-end",
-            pr: 5, // Fixed right padding
-          }}
+          {isPlaying ? (
+            <PauseIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
+          ) : (
+            <PlayArrowIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
+          )}
+        </IconButton>
+        <IconButton
+          size="small"
+          sx={{ color: "black" }}
+          onClick={onNext}
+          disabled={!hasNext}
         >
-          <VolumeUpIcon
-            sx={{
-              mr: 0.5,
-              color: "black",
-              fontSize: isSmallScreen ? "small" : "medium",
-            }}
-          />
-          <Slider
+          <SkipNextIcon fontSize="small" />
+        </IconButton>
+
+        {/* Loop button */}
+        <Tooltip title={loopInfo.tooltip}>
+          <IconButton
             size="small"
-            value={volume}
-            onChange={onVolumeChange}
-            aria-label="Volume"
-            sx={{
-              width: { xs: 50, sm: 80 }, // Smaller fixed width
-              color: "black",
-              "& .MuiSlider-thumb": {
-                backgroundColor: "black",
-                width: 10,
-                height: 10,
-              },
-              "& .MuiSlider-track": {
-                backgroundColor: "black",
-                height: 3,
-              },
-              "& .MuiSlider-rail": {
-                backgroundColor: "rgba(0,0,0,0.3)",
-                height: 3,
-              },
-            }}
-          />
-        </Box>
+            onClick={onLoopToggle}
+            sx={{ color: loopInfo.color, ml: 0.5 }}
+          >
+            {loopInfo.icon}
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      {/* Volume control */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          ml: 1,
+          mr: 2,
+          width: { xs: "80px", sm: "100px" },
+        }}
+      >
+        <VolumeUpIcon
+          sx={{
+            mr: 0.5,
+            color: "black",
+            fontSize: "small",
+          }}
+        />
+        <Slider
+          size="small"
+          value={volume}
+          onChange={onVolumeChange}
+          aria-label="Volume"
+          sx={{
+            width: { xs: 50, sm: 70 },
+            color: "black",
+            "& .MuiSlider-thumb": {
+              backgroundColor: "black",
+              width: 8,
+              height: 8,
+            },
+            "& .MuiSlider-track": {
+              backgroundColor: "black",
+              height: 3,
+            },
+            "& .MuiSlider-rail": {
+              backgroundColor: "rgba(0,0,0,0.3)",
+              height: 3,
+            },
+          }}
+        />
       </Box>
     </Paper>
   );

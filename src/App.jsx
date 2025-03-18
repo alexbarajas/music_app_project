@@ -17,6 +17,7 @@ export default function App() {
     volume,
     duration,
     currentTime,
+    loopMode,
     handleFilesSelected,
     handlePlayPause,
     handlePrevious,
@@ -24,9 +25,11 @@ export default function App() {
     handleVolumeChange,
     handleTrackSelect,
     handleSeek,
+    toggleLoopMode,
     getCurrentTrack,
     getTrackTitle,
     getArtistName,
+    getAlbumArt,
     hasPrevious,
     hasNext,
   } = AudioPlayer();
@@ -90,11 +93,14 @@ export default function App() {
           trackTitle={getTrackTitle()}
           artistName={getArtistName()}
           currentTrack={getCurrentTrack()}
+          albumArt={getAlbumArt()} // Add this line to pass album art
           hasPrevious={hasPrevious}
           hasNext={hasNext}
           duration={duration}
           currentTime={currentTime}
           onSeek={handleSeek}
+          loopMode={loopMode} // Add this line to pass loop mode
+          onLoopToggle={toggleLoopMode} // Add this line to pass loop toggle function
         />
       </Box>
     </Router>

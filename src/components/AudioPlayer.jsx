@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import * as mm from "music-metadata";
 
 const AudioPlayer = () => {
   const [tracks, setTracks] = useState([]);
@@ -8,6 +9,7 @@ const AudioPlayer = () => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [loopMode, setLoopMode] = useState("all"); // "none", "one", or "all"
+  const [trackMetadata, setTrackMetadata] = useState({});
   const audioRef = useRef(new Audio());
 
   useEffect(() => {
@@ -51,6 +53,47 @@ const AudioPlayer = () => {
     };
   }, [loopMode]); // Added loopMode as dependency
 
+  // Parse metadata when tracks change
+  const parseMetadata = async (file) => {
+    try {
+      // Create a Buffer from the File object
+      const arrayBuffer = await file.arrayBuffer();
+
+      // Parse metadata using music-metadata
+      const metadata = await mm.parseBuffer(
+        new Uint8Array(arrayBuffer),
+        file.type
+      );
+
+      // Extract cover art if available
+      let picture = null;
+      if (metadata.common.picture && metadata.common.picture.length > 0) {
+        const pictureData = metadata.common.picture[0];
+        const blob = new Blob([pictureData.data], { type: pictureData.format });
+        picture = URL.createObjectURL(blob);
+      }
+
+      return {
+        title: metadata.common.title || file.name.replace(/\.[^/.]+$/, ""),
+        artist: metadata.common.artist || "Unknown Artist",
+        album: metadata.common.album || "Unknown Album",
+        albumArt: picture || null,
+        year: metadata.common.year || null,
+        genre: metadata.common.genre?.[0] || "Unknown Genre",
+      };
+    } catch (error) {
+      console.error("Error parsing metadata:", error);
+      return {
+        title: file.name.replace(/\.[^/.]+$/, ""),
+        artist: "Unknown Artist",
+        album: "Unknown Album",
+        albumArt: null,
+        year: null,
+        genre: "Unknown Genre",
+      };
+    }
+  };
+
   // Handle track change
   useEffect(() => {
     const audio = audioRef.current;
@@ -63,6 +106,17 @@ const AudioPlayer = () => {
 
       // Create and set the object URL
       audio.src = URL.createObjectURL(currentTrack);
+
+      // Parse metadata for the current track
+      const loadMetadata = async () => {
+        const metadata = await parseMetadata(currentTrack);
+        setTrackMetadata((prevMetadata) => ({
+          ...prevMetadata,
+          [currentTrackIndex]: metadata,
+        }));
+      };
+
+      loadMetadata();
 
       if (isPlaying) {
         audio.play().catch((error) => {
@@ -90,18 +144,24 @@ const AudioPlayer = () => {
     }
   }, [isPlaying]);
 
-  const handleFilesSelected = (files) => {
+  const handleFilesSelected = async (files) => {
     // Create track objects from files
-    const newTracks = Array.from(files).map((file) => {
-      return file;
-    });
-
+    const newTracks = Array.from(files);
     setTracks(newTracks);
 
     // Auto-select first track if it's the first time loading tracks
     if (newTracks.length > 0 && currentTrackIndex === null) {
       setCurrentTrackIndex(0);
     }
+
+    // Parse metadata for all tracks
+    const newMetadata = {};
+    for (let i = 0; i < newTracks.length; i++) {
+      const metadata = await parseMetadata(newTracks[i]);
+      newMetadata[i] = metadata;
+    }
+
+    setTrackMetadata(newMetadata);
   };
 
   const handlePlayPause = () => {
@@ -164,30 +224,24 @@ const AudioPlayer = () => {
   };
 
   const getTrackTitle = () => {
-    const currentTrack = getCurrentTrack();
-    if (currentTrack) {
-      // Remove file extension for cleaner display
-      return currentTrack.name.replace(/\.[^/.]+$/, "");
+    if (currentTrackIndex !== null && trackMetadata[currentTrackIndex]) {
+      return trackMetadata[currentTrackIndex].title;
     }
     return "No track selected";
   };
 
-  // Extracting artist name is not straightforward from files
   const getArtistName = () => {
-    const currentTrack = getCurrentTrack();
-    if (currentTrack) {
-      const fileName = currentTrack.name;
-      // Common patterns: "Artist - Title" or "Artist_Title"
-      const separators = [" - ", "_", "-"];
-
-      for (const separator of separators) {
-        if (fileName.includes(separator)) {
-          return fileName.split(separator)[0];
-        }
-      }
-      return "Unknown Artist";
+    if (currentTrackIndex !== null && trackMetadata[currentTrackIndex]) {
+      return trackMetadata[currentTrackIndex].artist;
     }
     return "Unknown Artist";
+  };
+
+  const getAlbumArt = () => {
+    if (currentTrackIndex !== null && trackMetadata[currentTrackIndex]) {
+      return trackMetadata[currentTrackIndex].albumArt;
+    }
+    return null;
   };
 
   return {
@@ -209,6 +263,7 @@ const AudioPlayer = () => {
     getCurrentTrack,
     getTrackTitle,
     getArtistName,
+    getAlbumArt,
     hasPrevious: currentTrackIndex > 0 || loopMode === "all",
     hasNext: currentTrackIndex < tracks.length - 1 || loopMode === "all",
   };
