@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import Typography from "@mui/material/Typography";
 
 const MusicFolderSelector = ({ onFilesSelected }) => {
   const [folderPath, setFolderPath] = useState("");
@@ -56,8 +57,9 @@ const MusicFolderSelector = ({ onFilesSelected }) => {
 
   return (
     <div className="mb-8">
-      <h2 className="text-2xl font-bold mb-4">Music Folder Selection</h2>
-
+      <Typography variant="h5" component="h2" sx={{ mb: 4 }}>
+        Music Folder Selection
+      </Typography>
       <div className="mb-4">
         {/* Hide the actual file input completely */}
         <input

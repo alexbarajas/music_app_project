@@ -7,6 +7,7 @@ import Error from "./pages/Error";
 import Sidebar from "./components/Sidebar";
 import Box from "@mui/material/Box";
 import AudioPlayer from "./components/AudioPlayer";
+import ThemeProvider, { ThemeToggle } from "./theme/ThemeProvider";
 
 export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -41,72 +42,74 @@ export default function App() {
   };
 
   return (
-    <Router>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh",
-          width: "100%",
-        }}
-      >
-        <Header toggleDrawer={toggleDrawer} />
+    <ThemeProvider>
+      <Router>
         <Box
           sx={{
             display: "flex",
-            flex: 1,
-            mt: 8, // Account for fixed header height
-            mb: 7, // Account for footer height
+            flexDirection: "column",
+            minHeight: "100vh",
             width: "100%",
           }}
         >
-          <Sidebar open={drawerOpen} />
+          <Header toggleDrawer={toggleDrawer} />
           <Box
-            component="main"
             sx={{
-              flexGrow: 1,
-              p: 3,
-              ml: { xs: drawerOpen ? 8 : 2, sm: drawerOpen ? 2 : 2 }, // Responsive margin based on drawer state
+              display: "flex",
+              flex: 1,
+              mt: 8,
+              mb: 7,
+              width: "100%",
             }}
           >
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <Home
-                    onFilesSelected={handleFilesSelected}
-                    tracks={tracks}
-                    currentTrackIndex={currentTrackIndex}
-                    onTrackSelect={handleTrackSelect}
-                  />
-                }
-              />
-              <Route path="/*" element={<Error />} />
-            </Routes>
+            <Sidebar open={drawerOpen} />
+            <Box
+              component="main"
+              sx={{
+                flexGrow: 1,
+                p: 3,
+                ml: { xs: drawerOpen ? 8 : 2, sm: drawerOpen ? 2 : 2 },
+              }}
+            >
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <Home
+                      onFilesSelected={handleFilesSelected}
+                      tracks={tracks}
+                      currentTrackIndex={currentTrackIndex}
+                      onTrackSelect={handleTrackSelect}
+                    />
+                  }
+                />
+                <Route path="/*" element={<Error />} />
+              </Routes>
+            </Box>
           </Box>
+          <Footer
+            isPlaying={isPlaying}
+            onPlayPause={handlePlayPause}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+            volume={volume}
+            onVolumeChange={handleVolumeChange}
+            isMuted={isMuted}
+            onMuteToggle={handleMuteToggle}
+            trackTitle={getTrackTitle()}
+            artistName={getArtistName()}
+            currentTrack={getCurrentTrack()}
+            albumArt={getAlbumArt()}
+            hasPrevious={hasPrevious}
+            hasNext={hasNext}
+            duration={duration}
+            currentTime={currentTime}
+            onSeek={handleSeek}
+            loopMode={loopMode}
+            onLoopToggle={toggleLoopMode}
+          />
         </Box>
-        <Footer
-          isPlaying={isPlaying}
-          onPlayPause={handlePlayPause}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          volume={volume}
-          onVolumeChange={handleVolumeChange}
-          isMuted={isMuted}
-          onMuteToggle={handleMuteToggle}
-          trackTitle={getTrackTitle()}
-          artistName={getArtistName()}
-          currentTrack={getCurrentTrack()}
-          albumArt={getAlbumArt()}
-          hasPrevious={hasPrevious}
-          hasNext={hasNext}
-          duration={duration}
-          currentTime={currentTime}
-          onSeek={handleSeek}
-          loopMode={loopMode}
-          onLoopToggle={toggleLoopMode}
-        />
-      </Box>
-    </Router>
+      </Router>
+    </ThemeProvider>
   );
 }
