@@ -57,7 +57,7 @@ const MusicFolderSelector = ({ onFilesSelected }) => {
 
   return (
     <div className="mb-8">
-      <Typography variant="h5" component="h2" sx={{ mb: 4 }}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
         Music Folder Selection
       </Typography>
       <div className="mb-4">
@@ -88,35 +88,6 @@ const MusicFolderSelector = ({ onFilesSelected }) => {
           </button>
         )}
       </div>
-
-      {/* {isLoading && <p>Loading files...</p>} */}
-
-      {/* {folderPath && !isLoading && (
-        <div className="mt-4">
-          <p className="font-medium">Selected folder:</p>
-          <p className="px-3 py-2 bg-purple-800 rounded text-white">
-            {folderPath}
-          </p>
-        </div>
-      )} */}
-
-      {/* {files.length > 0 && !isLoading && (
-        <div className="mt-4">
-          <p className="font-medium">Found {files.length} music files</p>
-          <div className="mt-2 max-h-60 overflow-y-auto bg-purple-800 bg-opacity-50 rounded p-2">
-            <ul className="list-disc pl-6 space-y-1">
-              {files.map((file, index) => (
-                <li
-                  key={index}
-                  className="text-white hover:bg-purple-700 p-1 rounded cursor-pointer"
-                >
-                  {file.name}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };
