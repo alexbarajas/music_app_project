@@ -5,6 +5,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  useTheme,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
@@ -13,6 +14,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 
 export default function Sidebar({ open }) {
+  const theme = useTheme();
+
   // Width when open vs closed
   const drawerWidth = open ? 200 : 60;
 
@@ -44,7 +47,6 @@ export default function Sidebar({ open }) {
           boxSizing: "border-box",
           top: 64, // Height of AppBar
           height: "calc(100% - 64px - 56px)", // Account for AppBar and Footer
-          backgroundColor: "limegreen",
           overflowX: "hidden",
         },
       }}
@@ -60,6 +62,12 @@ export default function Sidebar({ open }) {
               minHeight: 48,
               px: 2.5,
               justifyContent: open ? "initial" : "center",
+              "&:hover": {
+                backgroundColor: (theme) =>
+                  theme.palette.mode === "light"
+                    ? "rgba(0, 0, 0, 0.04)"
+                    : "rgba(255, 255, 255, 0.08)",
+              },
             }}
           >
             <ListItemIcon
@@ -67,6 +75,7 @@ export default function Sidebar({ open }) {
                 minWidth: 0,
                 mr: open ? 3 : "auto",
                 justifyContent: "center",
+                color: "inherit",
               }}
             >
               {item.icon}

@@ -14,7 +14,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import VolumeOffIcon from "@mui/icons-material/VolumeOff"; // Added for mute functionality
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import RepeatOneIcon from "@mui/icons-material/RepeatOne";
 
@@ -25,8 +25,8 @@ export default function Footer({
   onNext = () => {},
   volume = 30,
   onVolumeChange = () => {},
-  onMuteToggle = () => {}, // Added for mute functionality
-  isMuted = false, // Added for mute functionality
+  onMuteToggle = () => {},
+  isMuted = false,
   trackTitle = "No track selected",
   artistName = "Unknown Artist",
   currentTrack = null,
@@ -83,9 +83,8 @@ export default function Footer({
         bottom: 0,
         left: 0,
         right: 0,
-        height: isSmallScreen ? "56px" : "64px", // Reduced fixed height
+        height: isSmallScreen ? "56px" : "64px",
         zIndex: 1300,
-        backgroundColor: "lightblue",
         width: "100%",
         boxSizing: "border-box",
         overflow: "visible",
@@ -128,7 +127,7 @@ export default function Footer({
               justifyContent: "center",
             }}
           >
-            <Typography variant="caption" color="white">
+            <Typography variant="caption" color="inherit">
               {artistName?.charAt(0) || "♪"}
             </Typography>
           </Box>
@@ -140,10 +139,10 @@ export default function Footer({
             overflow: "hidden",
           }}
         >
-          <Typography variant="subtitle2" noWrap color="black">
+          <Typography variant="subtitle2" noWrap color="inherit">
             {trackTitle}
           </Typography>
-          <Typography variant="caption" color="black" noWrap>
+          <Typography variant="caption" color="inherit" noWrap>
             {artistName}
           </Typography>
         </Box>
@@ -152,12 +151,13 @@ export default function Footer({
       {/* Time display - current time */}
       <Typography
         variant="caption"
-        color="text.secondary"
+        color="inherit"
         sx={{
           display: { xs: "none", sm: "block" },
           width: "40px",
           textAlign: "right",
           pr: 1,
+          opacity: 0.8,
         }}
       >
         {formatTime(currentTime)}
@@ -172,14 +172,14 @@ export default function Footer({
           onChange={(e, newValue) => onSeek(newValue)}
           aria-label="Progress"
           sx={{
-            color: "black",
+            color: "inherit",
             height: 4,
             "& .MuiSlider-thumb": {
               width: 8,
               height: 8,
-              backgroundColor: "black",
+              backgroundColor: "currentColor",
               "&:hover, &.Mui-focusVisible": {
-                boxShadow: "0px 0px 0px 8px rgba(0, 0, 0, 0.16)",
+                boxShadow: "0px 0px 0px 8px rgba(255, 255, 255, 0.16)",
               },
               "&.Mui-active": {
                 width: 12,
@@ -196,12 +196,13 @@ export default function Footer({
       {/* Time display - duration */}
       <Typography
         variant="caption"
-        color="text.secondary"
+        color="inherit"
         sx={{
           display: { xs: "none", sm: "block" },
           width: "40px",
           textAlign: "left",
           pl: 1,
+          opacity: 0.8,
         }}
       >
         {formatTime(duration)}
@@ -220,7 +221,7 @@ export default function Footer({
           <span>
             <IconButton
               size="small"
-              sx={{ color: "black" }}
+              sx={{ color: "inherit" }}
               onClick={onPrevious}
               disabled={!hasPrevious}
             >
@@ -233,7 +234,7 @@ export default function Footer({
           <IconButton
             sx={{
               mx: 0.5,
-              color: "black",
+              color: "inherit",
             }}
             size="small"
             onClick={onPlayPause}
@@ -251,7 +252,7 @@ export default function Footer({
           <span>
             <IconButton
               size="small"
-              sx={{ color: "black" }}
+              sx={{ color: "inherit" }}
               onClick={onNext}
               disabled={!hasNext}
             >
@@ -265,7 +266,11 @@ export default function Footer({
           <IconButton
             size="small"
             onClick={onLoopToggle}
-            sx={{ color: loopInfo.color, ml: 0.5 }}
+            sx={{
+              color: loopMode === "none" ? "inherit" : "inherit",
+              opacity: loopMode === "none" ? 0.6 : 1,
+              ml: 0.5,
+            }}
           >
             {loopInfo.icon}
           </IconButton>
@@ -287,7 +292,7 @@ export default function Footer({
           <IconButton
             size="small"
             onClick={onMuteToggle}
-            sx={{ color: "black" }}
+            sx={{ color: "inherit" }}
           >
             {isMuted ? (
               <VolumeOffIcon sx={{ fontSize: "small" }} />
@@ -304,18 +309,18 @@ export default function Footer({
           aria-label="Volume"
           sx={{
             width: { xs: 50, sm: 70 },
-            color: "black",
+            color: "inherit",
             "& .MuiSlider-thumb": {
-              backgroundColor: "black",
+              backgroundColor: "currentColor",
               width: 8,
               height: 8,
             },
             "& .MuiSlider-track": {
-              backgroundColor: "black",
+              backgroundColor: "currentColor",
               height: 3,
             },
             "& .MuiSlider-rail": {
-              backgroundColor: "rgba(0,0,0,0.3)",
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
               height: 3,
             },
           }}
