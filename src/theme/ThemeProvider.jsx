@@ -33,14 +33,18 @@ export default function ThemeProvider({ children }) {
         palette: {
           mode,
           primary: {
-            main: mode === "light" ? "#f44336" : "#ff7961",
+            main: mode === "light" ? "#3a86ff" : "#f44336",
           },
           secondary: {
-            main: mode === "light" ? "#4caf50" : "#80e27e",
+            main: mode === "light" ? "#4361ee" : "#80e27e",
           },
           background: {
-            default: mode === "light" ? "#f5f5f5" : "#121212",
+            default: mode === "light" ? "#f0f2f5" : "#121212",
             paper: mode === "light" ? "#ffffff" : "#1e1e1e",
+          },
+          text: {
+            primary: mode === "light" ? "#000000" : "#ffffff",
+            secondary: mode === "light" ? "#4a4a4a" : "#b3b3b3",
           },
         },
         typography: {
@@ -48,6 +52,29 @@ export default function ThemeProvider({ children }) {
             '"Your-Font-Name", "Roboto", "Helvetica", "Arial", sans-serif',
           h4: {
             fontWeight: 500,
+          },
+        },
+        components: {
+          MuiAppBar: {
+            styleOverrides: {
+              root: {
+                backgroundColor: mode === "light" ? "#3a86ff" : "#212121",
+              },
+            },
+          },
+          MuiDrawer: {
+            styleOverrides: {
+              paper: {
+                backgroundColor: mode === "light" ? "#e6eeff" : "#282828",
+              },
+            },
+          },
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                borderRadius: 8,
+              },
+            },
           },
         },
       }),
