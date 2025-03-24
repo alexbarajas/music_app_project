@@ -1,5 +1,10 @@
+# Node.js
 node_modules/
+
+# Python virtual enironment
 .env
+
+# macOS system files
 .DS_Store
 
 # personal
