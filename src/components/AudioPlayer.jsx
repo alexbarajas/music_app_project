@@ -260,7 +260,7 @@ const AudioPlayer = () => {
   };
 
   const handleSeek = (newTime) => {
-    if (audioRef.current) {
+    if (audioRef.current && currentTrackIndex !== null && tracks.length > 0) {
       audioRef.current.currentTime = newTime;
       setCurrentTime(newTime);
     }
