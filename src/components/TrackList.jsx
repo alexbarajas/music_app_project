@@ -19,7 +19,8 @@ const TrackList = ({ tracks, currentTrackIndex, onTrackSelect }) => {
     <Paper elevation={2} sx={{ mt: 4, overflow: "hidden" }}>
       <Box sx={{ p: 2, bgcolor: "primary.main" }}>
         <Typography variant="h6" color="white">
-          Your Music ({tracks.length} tracks)
+          Your Music ({tracks.length} {tracks.length === 1 ? "track" : "tracks"}
+          )
         </Typography>
       </Box>
 
