@@ -125,6 +125,7 @@ const AudioPlayer = () => {
 
       // Reset current time
       setCurrentTime(0);
+      audio.currentTime = 0; // Explicitly set the audio element's time to 0
 
       // Create and set the object URL
       audio.src = URL.createObjectURL(currentTrack);
@@ -254,7 +255,19 @@ const AudioPlayer = () => {
     setIsMuted(!isMuted);
   };
 
+  // const handleTrackSelect = (index) => {
+  //   setCurrentTrackIndex(index);
+  //   setIsPlaying(true);
+  // };
+
   const handleTrackSelect = (index) => {
+    // Reset current time when selecting a new track
+    if (currentTrackIndex !== index) {
+      setCurrentTime(0);
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+      }
+    }
     setCurrentTrackIndex(index);
     setIsPlaying(true);
   };
