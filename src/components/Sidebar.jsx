@@ -8,10 +8,12 @@ import {
   useTheme,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import HomeIcon from "@mui/icons-material/Home";
-import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
-import SearchIcon from "@mui/icons-material/Search";
-import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import LibraryMusicRoundedIcon from "@mui/icons-material/LibraryMusicRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import PlaylistAddRoundedIcon from "@mui/icons-material/PlaylistAddRounded";
+import FeaturedPlayListRoundedIcon from "@mui/icons-material/FeaturedPlayListRounded";
+import ExploreRoundedIcon from "@mui/icons-material/ExploreRounded";
 
 export default function Sidebar({ open }) {
   const theme = useTheme();
@@ -20,10 +22,20 @@ export default function Sidebar({ open }) {
   const drawerWidth = open ? 200 : 60;
 
   const menuItems = [
-    { text: "Home", icon: <HomeIcon />, path: "/" },
-    { text: "Library", icon: <LibraryMusicIcon />, path: "/library" },
-    { text: "Search", icon: <SearchIcon />, path: "/search" },
-    { text: "Playlists", icon: <PlaylistAddIcon />, path: "/playlists" },
+    { text: "Home", icon: <HomeRoundedIcon />, path: "/" },
+    { text: "Library", icon: <LibraryMusicRoundedIcon />, path: "/library" },
+    { text: "Search", icon: <SearchRoundedIcon />, path: "/search" },
+    {
+      text: "Playlists",
+      icon: <FeaturedPlayListRoundedIcon />,
+      path: "/playlists",
+    },
+    {
+      text: "Create Playlist",
+      icon: <PlaylistAddRoundedIcon />,
+      path: "/create-playlist",
+    },
+    { text: "Discover", icon: <ExploreRoundedIcon />, path: "/discover" },
   ];
 
   return (
@@ -68,6 +80,9 @@ export default function Sidebar({ open }) {
                     ? "rgba(0, 0, 0, 0.04)"
                     : "rgba(255, 255, 255, 0.08)",
               },
+              borderRadius: "8px",
+              margin: "4px 8px",
+              width: "auto",
             }}
           >
             <ListItemIcon
